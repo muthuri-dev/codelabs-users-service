@@ -2,71 +2,141 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+### Microservice Documentation: Users Microservice
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This documentation provides a detailed overview of the Users Microservice, focusing on the architecture, core components, and the flow of data and logic within the system.
 
-## Description
+#### Installation
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+To install and run the Users Microservice, follow these steps:
 
-## Installation
+1. **Clone the repository:**
 
-```bash
-$ npm install
+   ```bash
+   git clone <repository-url>
+   cd users-microservice
+   ```
+
+2. **Install dependencies:**
+
+   Install the required dependencies using npm:
+
+   ```bash
+   npm install
+   ```
+
+3. **Setup Prisma:**
+
+   Generate the Prisma client:
+
+   ```bash
+   npx prisma generate
+   ```
+
+4. **Environment Variables:**
+
+   Ensure you have a `.env` file in the root directory with the necessary environment variables, such as database connection strings.
+
+5. **Run the microservice:**
+
+   To run the service in development mode with hot-reloading:
+
+   ```bash
+   npm run start:dev
+   ```
+
+   For production:
+
+   ```bash
+   npm run start:prod
+   ```
+
+#### Architecture
+
+The Users Microservice is built using the NestJS framework, which provides a modular architecture. The core modules and services include:
+
+- **UsersModule**: The main module for user-related functionality.
+- **UsersService**: Contains the business logic for managing users.
+- **UsersResolver**: Handles GraphQL queries and mutations for user operations.
+- **PrismaDBService**: Connects the microservice to the database using Prisma ORM.
+
+##### High-Level Architecture
+
+```mermaid
+graph TD;
+    A[NestJS Application] -->|Imports| B[UsersModule]
+    B -->|Provides| C[UsersService]
+    B -->|Provides| D[UsersResolver]
+    B -->|Imports| E[PrismaDBService]
 ```
 
-## Running the app
+#### Core Components
 
-```bash
-# development
-$ npm run start
+##### UsersModule
 
-# watch mode
-$ npm run start:dev
+The `UsersModule` integrates all the components related to user management.
 
-# production mode
-$ npm run start:prod
+```mermaid
+classDiagram
+    class UsersModule {
+        +UsersService usersService
+        +UsersResolver usersResolver
+        +PrismaDBService prismaDBService
+    }
+    UsersModule : +configure()
+    UsersModule : +registerServices()
 ```
 
-## Test
+##### UsersService
 
-```bash
-# unit tests
-$ npm run test
+The `UsersService` provides the business logic for user operations such as finding a user by ID and updating user preferences.
 
-# e2e tests
-$ npm run test:e2e
+```mermaid
+classDiagram
+    class UsersService {
+        +UserEntity findUserById(userId: string)
+        +UserEntity updateUserPreferences(userId: string, preferences: UpdateUserPreferencesDto)
+    }
+    UsersService --> PrismaDBService : Uses
 
-# test coverage
-$ npm run test:cov
 ```
 
-## Support
+##### UsersResolver
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+The `UsersResolver` handles GraphQL queries and mutations. It interacts with `UsersService` to resolve user-related requests.
 
-## Stay in touch
+```mermaid
+classDiagram
+    class UsersResolver {
+        +UserEntity user(id: string)
+        +UserEntity updateUserPreferences(updateUserPreferencesData: UpdateUserPreferencesDto)
+    }
+    UsersResolver --> UsersService : Uses
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```
+
+#### Flow of Data
+
+The following sequence diagram illustrates the flow of data within the microservice when a user updates their preferences.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant UsersResolver
+    participant UsersService
+    participant PrismaDBService
+
+    Client->>+UsersResolver: UpdateUserPreferences Mutation
+    UsersResolver->>+UsersService: updateUserPreferences()
+    UsersService->>+PrismaDBService: updateUserPreferences()
+    PrismaDBService-->>-UsersService: Updated UserEntity
+    UsersService-->>-UsersResolver: Updated UserEntity
+    UsersResolver-->>-Client: Updated UserEntity
+```
+
+#### Summary
+
+The Users Microservice is structured to handle user management efficiently within a larger application. The architecture is modular, making it easy to maintain and extend. The use of NestJS, GraphQL, and Prisma ORM ensures a robust and scalable solution. The documentation provides an overview of the key components and how they interact, illustrated with mermaid diagrams to visualize the architecture and data flow.
 
 ## License
 
